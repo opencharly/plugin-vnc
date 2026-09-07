@@ -34,10 +34,12 @@ type vncEndpoint struct {
 
 // vncEnv is the plugin-side decode of the CheckEnv the host ships as Operation.Env for a
 // `vnc:` check step (provider_checkenv.go). Box/Mode mirror the shared CheckEnv; the endpoint
-// is no longer pre-shipped — the plugin resolves it via cc.ResolveGraphicsEndpoint.
+// is no longer pre-shipped — the plugin resolves it via cc.ResolveGraphicsEndpoint;
+// Venue is the shared snapshot's venue id (session evidence-row provenance).
 type vncEnv struct {
-	Box  string `json:"box"`
-	Mode string `json:"mode"` // "live" | "box"
+	Box   string `json:"box"`
+	Mode  string `json:"mode"` // "live" | "box"
+	Venue string `json:"venue"`
 }
 
 type provider struct{ pb.UnimplementedProviderServer }
@@ -90,6 +92,17 @@ func (provider) Invoke(ctx context.Context, req *pb.InvokeRequest) (*pb.InvokeRe
 		return sdk.ResultJSON("skip", fmt.Sprintf("vnc: %s has no resolved VNC endpoint (box=%q)", method, env.Box))
 	}
 	ep := &vncEndpoint{Addr: ge.Addr, Password: ge.Password}
+
+	// session (Cutover E, E-1): the DETACHED recorder holds the RFB wire — the provider
+	// never dials. The endpoint resolution above gates on the live deployment (mirroring
+	// the record-session contract); start hands the spawn to the runner's generic
+	// background-session service (verb:session) over the InvokeProvider reverse leg;
+	// stop/status talk to that same service. No artifact is produced inside this Invoke
+	// (the recorder writes frames.mjpeg detached), so artifactMethod stays false.
+	if method == "session" {
+		out, runErr := runSession(ctx, cc, ep, &in, env.Venue)
+		return sdk.VerbVerdict("vnc", method, out, runErr, &op, false)
+	}
 
 	out, runErr := dispatch(ep, &op, &in)
 

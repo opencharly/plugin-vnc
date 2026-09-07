@@ -1,6 +1,6 @@
 // Package vnc is the charly plugin serving the `vnc` RFB/VNC
 // check verb (an importable root package + its own go.mod). It drives a live deployment's
-// VNC desktop over the RFB protocol — status/screenshot/click/mouse/type/key/rfb —
+// VNC desktop over the RFB protocol — status/screenshot/click/mouse/type/key/rfb/session —
 // speaking RFC 6143 (the custom stdlib-only VNC client: VeNCrypt/TLS + ZRLE decode).
 // The host go-builds this binary and serves it OUT-OF-PROCESS over go-plugin gRPC via
 // the charly plugin SDK, so the `vnc:` verb dispatches through the provider registry

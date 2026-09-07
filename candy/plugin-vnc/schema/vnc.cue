@@ -26,7 +26,13 @@
 #VncInput: {
 	// method — the vnc method to dispatch (the former core #VncMethod enum; also
 	// the scalar-sugar primary: `vnc: <method>`).
-	method: "status" | "screenshot" | "click" | "mouse" | "type" | "key" | "rfb"
+	method: "status" | "screenshot" | "click" | "mouse" | "type" | "key" | "rfb" | "session"
+	// action — start|stop|status for a session (session). session start begins
+	// capturing the RFB framebuffer at fps into an MJPEG stream (the host-side
+	// detached recorder); session stop finalizes it to the evidence row.
+	action?: "start" | "stop" | "status" @go(Action)
+	// fps — the framebuffer capture rate for session (default 5).
+	fps?: int & >=1 @go(Fps,type=int)
 	// x / y — desktop-absolute coordinates (click/mouse).
 	x?: int @go(,type=int)
 	y?: int @go(,type=int)
@@ -49,4 +55,19 @@
 	artifact_min_bytes?:      int & >=0                    @go(ArtifactMinBytes,type=int)
 	artifact_min_dimensions?: string & =~"^[0-9]+x[0-9]+$" @go(ArtifactMinDimensions)
 	artifact_not_uniform?:    bool                         @go(ArtifactNotUniform)
+	// session — the DETACHED host-side recorder (Cutover E, E-1): `vnc: session` starts
+	// the plugin's OWN binary in recorder mode through the runner's generic
+	// background-session service (plugin-check's verb:session seam). The recorder
+	// holds the RFB wire itself — the provider stays wire-free — polls the
+	// framebuffer at fps into state_dir/frames.mjpeg, and on SIGTERM finalizes with
+	// the FINAL marker + the evidence row.json. venue/phase are stamped into the
+	// evidence row.
+	session_id?: string @go(SessionId)
+	state_dir?:  string @go(StateDir)
+	// artifact_dir — the runner-injected generic evidence-artifact dir (verb-agnostic;
+	// the provider appends its own filename/extension).
+	artifact_dir?: string @go(ArtifactDir)
+	log_dir?:  string @go(LogDir)
+	venue?:      string @go(Venue)
+	phase?:      string @go(Phase)
 }
