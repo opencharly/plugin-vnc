@@ -13,7 +13,9 @@ import (
 	"github.com/opencharly/spec/spec"
 )
 
-// methods.go is the vnc method dispatcher: the 7-method surface moved from charly/vnc.go,
+// methods.go is the vnc method dispatcher: the 7-method surface moved from charly/vnc.go
+// (plus the session method, plan Cutover E, E-1 — dispatched from provider.go before
+// dialing, over the runner's generic background-session service),
 // refactored from CLI Run() methods that PRINTED to stdout/stderr into functions that
 // RETURN the captured output string (status) or WRITE a PNG artifact + return a one-line
 // confirmation (screenshot) — so provider.go can feed the output through the shared sdk

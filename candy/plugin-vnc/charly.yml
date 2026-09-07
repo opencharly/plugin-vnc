@@ -23,7 +23,8 @@ plugin-vnc:
             a container's published port 5900, or a VM's libvirt-discovered <graphics type='vnc'>
             listener bridged/tunneled to a host-reachable TCP address — plus the resolved
             password, so this plugin needs no container inspection at all. Provides status/screenshot/click/mouse/
-            type/key/rfb. The R10 consumer is a wayvnc-bearing pod bed whose check composes this
+            type/key/rfb/session (session = the host-side detached RFB framebuffer recorder over the runner's
+            generic background-session service, Cutover E E-1). The R10 consumer is a wayvnc-bearing pod bed whose check composes this
             plugin (e.g. sway-browser-vnc via sway-desktop-vnc).
         plugin:
             source: github.com/opencharly/plugin-vnc/candy/plugin-vnc
@@ -37,5 +38,36 @@ plugin-vnc:
                 - contains: ok
               eventually: 60s
               retry_interval: 5s
+              context:
+                - runtime
+            - check: the vnc session method starts a HOST-side detached RFB capture recorder against the live desktop's wayvnc endpoint (framebuffer polling at fps into MJPEG through the runner's generic background-session service)
+              id: vnc-session-start
+              vnc:
+                method: session
+                action: start
+                session_id: ade-vnc-session
+                fps: 2
+              stdout:
+                - contains: started
+              context:
+                - runtime
+            - check: the vnc session status reports the detached recorder alive
+              id: vnc-session-status
+              vnc:
+                method: session
+                action: status
+                session_id: ade-vnc-session
+              stdout:
+                - contains: alive=true
+              context:
+                - runtime
+            - check: the vnc session stop finalizes the detached recorder and its evidence row (frames.mjpeg + row.json)
+              id: vnc-session-stop
+              vnc:
+                method: session
+                action: stop
+                session_id: ade-vnc-session
+              stdout:
+                - contains: stopped
               context:
                 - runtime
