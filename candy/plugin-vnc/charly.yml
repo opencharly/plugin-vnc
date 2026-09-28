@@ -1,7 +1,5 @@
-version: 2026.232.0520
 plugin-vnc:
     candy:
-        version: 2026.178.1200
         description: |-
             OUT-OF-TREE charly plugin serving the `vnc` RFB/VNC check verb — a standalone
             Go module (go.mod + main.go) that drives a live deployment's VNC desktop over
