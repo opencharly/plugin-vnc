@@ -65,13 +65,16 @@ type VncInput struct {
 	// artifact — the host path `screenshot` writes the PNG to.
 	Artifact string `yaml:"artifact,omitempty" json:"artifact,omitempty"`
 
-	// artifact_min_bytes / artifact_min_dimensions / artifact_not_uniform — the
-	// post-run artifact-reality assertions (sdk.RunArtifactValidators).
+	// artifact_min_bytes / artifact_min_dimensions / artifact_not_uniform /
+	// artifact_contains_text — the post-run artifact-reality assertions
+	// (sdk.RunArtifactValidators).
 	ArtifactMinBytes int `yaml:"artifact_min_bytes,omitempty" json:"artifact_min_bytes,omitempty"`
 
 	ArtifactMinDimensions string `yaml:"artifact_min_dimensions,omitempty" json:"artifact_min_dimensions,omitempty"`
 
 	ArtifactNotUniform bool `yaml:"artifact_not_uniform,omitempty" json:"artifact_not_uniform,omitempty"`
+
+	ArtifactContainsText string `yaml:"artifact_contains_text,omitempty" json:"artifact_contains_text,omitempty"`
 
 	// session — the DETACHED host-side recorder (Cutover E, E-1): `vnc: session` starts
 	// the plugin's OWN binary in recorder mode through the runner's generic

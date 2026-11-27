@@ -50,11 +50,17 @@
 	params?: string
 	// artifact — the host path `screenshot` writes the PNG to.
 	artifact?: string
-	// artifact_min_bytes / artifact_min_dimensions / artifact_not_uniform — the
-	// post-run artifact-reality assertions (sdk.RunArtifactValidators).
+	// artifact_min_bytes / artifact_min_dimensions / artifact_not_uniform /
+	// artifact_contains_text — the post-run artifact-reality assertions
+	// (sdk.RunArtifactValidators). `artifact_contains_text` is OCR: the shared
+	// implementation reads the text out of the PNG with tesseract ON THE HOST (so the
+	// engine and its language data are a host prerequisite of any bed that authors it),
+	// which is what lets a `vnc: screenshot` assert what the STREAMED DESKTOP shows
+	// rather than only that a file exists and is not uniform.
 	artifact_min_bytes?:      int & >=0                    @go(ArtifactMinBytes,type=int)
 	artifact_min_dimensions?: string & =~"^[0-9]+x[0-9]+$" @go(ArtifactMinDimensions)
 	artifact_not_uniform?:    bool                         @go(ArtifactNotUniform)
+	artifact_contains_text?:  string                       @go(ArtifactContainsText)
 	// session — the DETACHED host-side recorder (Cutover E, E-1): `vnc: session` starts
 	// the plugin's OWN binary in recorder mode through the runner's generic
 	// background-session service (plugin-check's verb:session seam). The recorder
